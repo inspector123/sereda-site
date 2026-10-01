@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vance Sereda / How I work with coding agents</title>
-<meta name="description" content="Vance Sereda, senior software engineer. My coding agent setup: OMP, a phone app I built for it, and local models on my own GPUs.">
+<title>Vance Sereda / OMP phone app demo</title>
+<meta name="description" content="A recording of the OMP phone app running a coding session on a local model, with notes on how it works and the hardware behind it.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -20,35 +20,34 @@
   </header>
 
   <section class="intro">
-    <div class="text">
-      <h1>How I work with coding agents</h1>
-      <p>I use OMP, an open source agent harness. I forked Happy Coder, an open source mobile client for Claude Code, and rewrote the backend as an OMP extension, so the app on my phone talks to the same OMP session that's running on my computer. Messages from the phone go in through <code>pi.sendUserMessage</code>, and the app gets OMP's own events back instead of reading the terminal.</p>
-      <ul>
-        <li>Tool calls, reasoning and subagents show up as they happen.</li>
-        <li>I can switch models and answer the agent's questions from the phone, including sudo password prompts.</li>
-        <li>A session started on the phone can be picked up later at my desk.</li>
-      </ul>
-      <p class="small">The recording is one prompt from the phone, running on Qwen3.8-Flash-Next on my own GPUs at about 94 tok/s. It fixes two bugs I planted, messes up one of its own edits and fixes that too, then runs the tests. Not edited, 73 seconds, recorded on an Android emulator against a separate test server.</p>
-    </div>
     <div class="phone">
       <div class="screen">
         <video src="media/demo.mp4" poster="media/session.png" autoplay muted loop playsinline aria-label="Screen recording of the phone app running a coding agent session"></video>
       </div>
     </div>
-  </section>
+    <div class="text">
+      <h1>The phone app</h1>
+      <p class="small">One prompt from the phone to Qwen3.8-Flash-Next running on my GPUs, about 94 tok/s. Unedited, 73 seconds, recorded on an Android emulator against a separate test server.</p>
 
-  <section class="row">
-    <div>
-      <h2>Models</h2>
-      <p>I switch models depending on which one is best at the moment. I was on GPT-5.6 while it led the benchmarks, then Opus 5.5 pulled ahead and I went back to Claude. I use GPT for a second opinion and side tasks. Gemini does around 300 tokens a second, which is nice for quick stuff, but it doesn't go as deep.</p>
-    </div>
-    <div>
-      <h2>Local models</h2>
-      <p>A box at home with two 3090s and two CMP 170HX cards runs Qwen3.8-Flash-Next and GLM-5.3-Flash on vLLM. I set up the configs myself. Qwen does about 90 to 100 tok/s at FP8 and over 200 at 4 bit. I tracked a repeating-token bug in one setup down to vLLM itself. Given one thing at a time it's pretty close to Opus. It falls short on root cause analysis and edge cases.</p>
-    </div>
-    <div>
-      <h2>Work</h2>
-      <p>Senior software engineer at BrightCanary, an app that helps parents keep their kids safe online. I own the AI side: what kids type and text goes to an LLM that checks for unsafe or dangerous situations and alerts the parent, and gives parents summaries of how their kid is doing. I built the Gemini memory system behind it, moved our AI to Azure (about $100K a year saved), own the Go backend and built the Android app. Before that, Bluetooth SIG from 2019 to 2025.</p>
+      <h2>How it works</h2>
+      <p>The app is a fork of Happy Coder. I replaced the backend with an OMP extension.</p>
+      <ul>
+        <li>On my computer a small wrapper runs OMP in a terminal and keeps a connection to a relay server I host.</li>
+        <li>The extension runs inside OMP and talks to the wrapper over a local socket.</li>
+        <li>Prompts from the phone go into the session with <code>pi.sendUserMessage</code>.</li>
+        <li>OMP's own events (text, reasoning, tool calls, subagents) go back to the phone, so nothing is read off the terminal.</li>
+        <li>Because it's a normal OMP session, I can open the same one at my desk.</li>
+      </ul>
+
+      <h2>The rig</h2>
+      <table>
+        <tr><th>GPUs</th><td>2x RTX 3090, 2x CMP 170HX</td></tr>
+        <tr><th>CPU / board</th><td>EPYC 7452, ASRockRack ROMED8-2T</td></tr>
+        <tr><th>Serving</th><td>vLLM, model split across all four cards, MTP speculative decoding, 256K context</td></tr>
+        <tr><th>Qwen FP8</th><td>90 to 100 tok/s</td></tr>
+        <tr><th>Qwen 4 bit</th><td>about 233 tok/s on two cards</td></tr>
+        <tr><th>500K token input</th><td>145 tok/s after 95 s to first token</td></tr>
+      </table>
     </div>
   </section>
 
