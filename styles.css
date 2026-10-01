@@ -136,7 +136,7 @@ h3 { font-size: 1.05rem; margin: 0 0 8px; }
 .btn.primary:hover { filter: brightness(1.08); }
 
 /* Phone frame */
-.phone-wrap { display: flex; justify-content: center; }
+.phone-wrap { display: flex; flex-direction: column; align-items: center; }
 
 .phone {
   width: min(280px, 72vw);
