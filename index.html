@@ -4,228 +4,55 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vance Sereda / How I work with coding agents</title>
-<meta name="description" content="Vance Sereda, senior software engineer in Edmonds, Washington. How I run coding agents from my phone, my desk, and a four-GPU box at home.">
+<meta name="description" content="Vance Sereda, senior software engineer. My coding agent setup: OMP, a phone app I built for it, and local models on my own GPUs.">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body id="top">
-
-<header class="topbar">
-  <a class="brand" href="#top">Vance Sereda</a>
-  <nav class="nav" aria-label="Sections">
-    <a href="#app">Phone app</a>
-    <a href="#how">How it works</a>
-    <a href="#models">Models</a>
-    <a href="#rig">The rig</a>
-    <a href="#work">Day job</a>
-  </nav>
-</header>
-
+<body>
 <main>
 
-  <section class="hero reveal">
-    <p class="eyebrow">Senior Software Engineer / Edmonds, Washington</p>
-    <h1>How I work with coding agents: at my desk, from my phone, on frontier models and on my own GPUs.</h1>
-    <p class="lede">I use OMP, an open source agent harness, and I built a phone app for it, so the same session follows me from the desk to a walk. The models run in the cloud or on a four-GPU box in my house.</p>
-    <div class="cta-row">
-      <a class="btn primary" href="https://github.com/inspector123/omp-happy">Phone app on GitHub</a>
-      <a class="btn" href="https://www.linkedin.com/in/vancesereda">LinkedIn</a>
-      <a class="btn" href="mailto:vancesereda@gmail.com">Email</a>
-    </div>
-  </section>
+  <header class="top">
+    <span class="name">Vance Sereda</span>
+    <span class="links">
+      <a href="https://github.com/inspector123/omp-happy">GitHub</a>
+      <a href="https://www.linkedin.com/in/vancesereda">LinkedIn</a>
+      <a href="mailto:vancesereda@gmail.com">vancesereda@gmail.com</a>
+    </span>
+  </header>
 
-  <section id="app" class="section">
-    <div class="section-head reveal">
-      <p class="eyebrow">The centerpiece</p>
-      <h2>A phone app that controls my real coding session</h2>
-      <p class="lede">I forked Happy Coder, an open source mobile client for Claude Code, and rewrote the backend as an OMP extension. The app controls the same native OMP session running on my machine. It is not a remote desktop and nothing is scraped off a terminal.</p>
-    </div>
-
-    <div class="demo-grid">
-      <div class="phone-wrap reveal">
-        <div class="phone">
-          <div class="screen">
-            <video src="media/demo.mp4" poster="media/session.png" autoplay muted loop playsinline aria-label="Screen recording of the phone app driving a coding agent session"></video>
-          </div>
-        </div>
-        <p class="demo-caption">Unedited recording, 73 seconds. The phone sends one prompt; the agent is Qwen3.8-Flash-Next on my home rig at about 94 tok/s. It finds two seeded bugs, catches and repairs its own bad edit, and runs the tests before reporting. Captured on an Android emulator against a separate demo relay.</p>
-      </div>
-      <ul class="features reveal">
-        <li>
-          <strong>Live everything.</strong>
-          Tool calls, reasoning traces, and subagent output stream to the phone as structured events while the agent works.
-        </li>
-        <li>
-          <strong>Control from the couch.</strong>
-          Switch model and reasoning level mid-session. Answer the agent's questions, and even sudo password prompts, without walking to the desk.
-        </li>
-        <li>
-          <strong>No handoff cost.</strong>
-          Start a session from the phone, then attach to the same process later at the desk with herdr or tmux.
-        </li>
-        <li>
-          <strong>Real numbers.</strong>
-          Native OMP quota and token spend, shown in the app.
-        </li>
+  <section class="intro">
+    <div class="text">
+      <h1>How I work with coding agents</h1>
+      <p>I use OMP, an open source agent harness. I forked Happy Coder, an open source mobile client for Claude Code, and rewrote the backend as an OMP extension, so the app on my phone talks to the same OMP session that's running on my computer. Messages from the phone go in through <code>pi.sendUserMessage</code>, and the app gets OMP's own events back instead of reading the terminal.</p>
+      <ul>
+        <li>Tool calls, reasoning and subagents show up as they happen.</li>
+        <li>I can switch models and answer the agent's questions from the phone, including sudo password prompts.</li>
+        <li>A session started on the phone can be picked up later at my desk.</li>
       </ul>
+      <p class="small">The recording is one prompt from the phone, running on Qwen3.8-Flash-Next on my own GPUs at about 94 tok/s. It fixes two bugs I planted, messes up one of its own edits and fixes that too, then runs the tests. Not edited, 73 seconds, recorded on an Android emulator against a separate test server.</p>
     </div>
-
-    <div class="gallery reveal">
-      <figure>
-        <div class="phone small">
-          <div class="screen"><img src="media/sessions.png" alt="Sessions screen in the phone app" loading="lazy"></div>
-        </div>
-        <figcaption>Sessions</figcaption>
-      </figure>
-      <figure>
-        <div class="phone small">
-          <div class="screen"><img src="media/session.png" alt="A running session in the phone app" loading="lazy"></div>
-        </div>
-        <figcaption>Session view</figcaption>
-      </figure>
-      <figure>
-        <div class="phone small">
-          <div class="screen"><img src="media/models.png" alt="Model picker in the phone app" loading="lazy"></div>
-        </div>
-        <figcaption>Model picker</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <section id="how" class="section alt">
-    <div class="section-head reveal">
-      <p class="eyebrow">Under the hood</p>
-      <h2>How it works</h2>
-      <p class="lede">Prompts from the phone enter the session through <code>pi.sendUserMessage</code>. Everything the agent produces comes back as structured events, not terminal scrapes.</p>
-    </div>
-
-    <div class="how-grid">
-      <div class="flow reveal" role="img" aria-label="Architecture: the phone app connects through a self-hosted encrypted relay to a CLI wrapper on the computer, which drives the native OMP terminal UI inside a pseudoterminal. A Pi extension inside OMP connects back to the CLI wrapper over a private Unix socket using newline-delimited JSON.">
-        <div class="fnode">
-          <span class="ftitle">Phone app</span>
-          <span class="fsub">fork of Happy Coder</span>
-        </div>
-        <div class="flink"><span>prompts out, events back</span></div>
-        <div class="fnode">
-          <span class="ftitle">Encrypted relay</span>
-          <span class="fsub">self-hosted</span>
-        </div>
-        <div class="flink"></div>
-        <div class="fnode">
-          <span class="ftitle">CLI wrapper</span>
-          <span class="fsub">on my computer</span>
-        </div>
-        <div class="flink"><span>drives the terminal</span></div>
-        <div class="fnode">
-          <span class="ftitle">Native OMP terminal UI</span>
-          <span class="fsub">inside a pseudoterminal</span>
-        </div>
-        <div class="flink dashed"><span>private Unix socket, newline-delimited JSON, back to the CLI wrapper</span></div>
-        <div class="fnode dashed">
-          <span class="ftitle">Pi extension inside OMP</span>
-          <span class="fsub">mirrors streamed text, reasoning, tool calls, subagent output</span>
-        </div>
-      </div>
-      <div class="how-notes reveal">
-        <p>The wrapper and the extension split the work. The wrapper owns the terminal and the relay connection. The extension lives inside the agent and sees the real event stream.</p>
-        <p>Because events are structured, the phone renders tool calls, reasoning, and subagent progress natively. The same process stays attachable at the desk, so a session started on the phone is just a normal OMP session.</p>
+    <div class="phone">
+      <div class="screen">
+        <video src="media/demo.mp4" poster="media/session.png" autoplay muted loop playsinline aria-label="Screen recording of the phone app running a coding agent session"></video>
       </div>
     </div>
   </section>
 
-  <section id="models" class="section">
-    <div class="section-head reveal">
-      <p class="eyebrow">The harness and the models</p>
-      <h2>Models I use</h2>
-      <p class="lede">My harness is OMP (oh-my-pi), an open source coding agent harness. I move between models depending on who is ahead, and the phone app and my rig follow me across all of them.</p>
+  <section class="row">
+    <div>
+      <h2>Models</h2>
+      <p>I switch models depending on which one is best at the moment. I was on GPT-5.6 while it led the benchmarks, then Opus 5.5 pulled ahead and I went back to Claude. I use GPT for a second opinion and side tasks. Gemini does around 300 tokens a second, which is nice for quick stuff, but it doesn't go as deep.</p>
     </div>
-    <div class="cards reveal">
-      <div class="card">
-        <h3>Claude</h3>
-        <p>I was on GPT-5.6 while it led the benchmarks. Opus 5.5 pulled ahead and I went back to Claude.</p>
-      </div>
-      <div class="card">
-        <h3>GPT</h3>
-        <p>My second opinion and my pick for side tasks. A different model looking at the same problem catches what one model misses.</p>
-      </div>
-      <div class="card">
-        <h3>Gemini</h3>
-        <p>About 300 tokens per second. I reach for it when speed matters more than depth.</p>
-      </div>
+    <div>
+      <h2>Local models</h2>
+      <p>A box at home with two 3090s and two CMP 170HX cards runs Qwen3.8-Flash-Next and GLM-5.3-Flash on vLLM. I set up the configs myself. Qwen does about 90 to 100 tok/s at FP8 and over 200 at 4 bit. I tracked a repeating-token bug in one setup down to vLLM itself. Given one thing at a time it's pretty close to Opus. It falls short on root cause analysis and edge cases.</p>
     </div>
-  </section>
-
-  <section id="rig" class="section alt">
-    <div class="section-head reveal">
-      <p class="eyebrow">Home lab</p>
-      <h2>A four-GPU box for local models</h2>
-      <p class="lede">I serve Qwen3.8-Flash-Next and GLM-5.3-Flash through vLLM with configs I tune myself: pipeline parallel across all four cards, MTP speculative decoding, 256K context, and FP8 or 4-bit quantization.</p>
-    </div>
-
-    <div class="tables-grid reveal">
-      <div>
-        <h3>Hardware</h3>
-        <table class="specs">
-          <tbody>
-            <tr><th>GPUs</th><td>2x RTX 3090 + 2x NVIDIA CMP 170HX</td></tr>
-            <tr><th>CPU</th><td>AMD EPYC 7452</td></tr>
-            <tr><th>Board</th><td>ASRockRack ROMED8-2T</td></tr>
-            <tr><th>RAM</th><td>125 GB</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div>
-        <h3>Measured</h3>
-        <table class="specs">
-          <tbody>
-            <tr><th>Qwen FP8</th><td><span class="n">90 to 100</span> tok/s decode</td></tr>
-            <tr><th>Qwen 4-bit, two cards</th><td><span class="n">~233</span> tok/s</td></tr>
-            <tr><th>500K token input</th><td><span class="n">145</span> tok/s decode after <span class="n">94.7 s</span> to first token</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="how-notes rig-notes reveal">
-      <p>Tuning the stack means owning the bugs too. I traced a repeating-token loop in one config to an upstream vLLM bug.</p>
-      <p>On quality: given one task at a time the local models come close to Opus. They fall short on root cause analysis and edge cases, so the frontier models stay in rotation.</p>
-    </div>
-  </section>
-
-  <section id="work" class="section">
-    <div class="section-head reveal">
-      <p class="eyebrow">Day job</p>
-      <h2>BrightCanary</h2>
-      <p class="lede">Senior software engineer since June 2025. BrightCanary is an app that helps parents keep their kids safe online.</p>
-    </div>
-    <div class="prose reveal">
-      <p>I own the AI side end to end. What kids type and text goes to an LLM that checks whether they are doing something unsafe or are in a dangerous situation, and alerts the parent. The same system gives parents summaries of how their kid is doing and feeling. I built the Gemini memory system that tracks conversations over time without reprocessing everything, and I moved our AI workloads to Azure, cutting about $100K a year. I also own the production Go backend and built the Android version of the app.</p>
-      <p>Before that I spent 2019 to 2025 at the Bluetooth SIG, senior software engineer from 2022. I led the member web platform and the Dynamics-to-HubSpot migration onto event-driven Kafka services with PostgreSQL.</p>
-      <p class="edu">BS Chemical Engineering, University of Washington.</p>
-    </div>
-  </section>
-
-  <section id="projects" class="section alt">
-    <div class="section-head reveal">
-      <p class="eyebrow">Nights and weekends</p>
-      <h2>Side projects</h2>
-    </div>
-    <div class="prose reveal">
-      <p>I build apps for myself, and the OMP phone app above is one of them. The other one I like talking about is a bot that browses job sites, fills out applications, and solves captchas.</p>
+    <div>
+      <h2>Work</h2>
+      <p>Senior software engineer at BrightCanary, an app that helps parents keep their kids safe online. I own the AI side: what kids type and text goes to an LLM that checks for unsafe or dangerous situations and alerts the parent, and gives parents summaries of how their kid is doing. I built the Gemini memory system behind it, moved our AI to Azure (about $100K a year saved), own the Go backend and built the Android app. Before that, Bluetooth SIG from 2019 to 2025.</p>
     </div>
   </section>
 
 </main>
-
-<footer class="footer">
-  <p class="foot-name">Vance Sereda</p>
-  <p>Senior Software Engineer / Edmonds, Washington</p>
-  <p class="foot-links">
-    <a href="mailto:vancesereda@gmail.com">vancesereda@gmail.com</a>
-    <a href="https://www.linkedin.com/in/vancesereda">linkedin.com/in/vancesereda</a>
-    <a href="https://github.com/inspector123/omp-happy">github.com/inspector123/omp-happy</a>
-  </p>
-</footer>
-
 <script src="main.js"></script>
 </body>
 </html>
