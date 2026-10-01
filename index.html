@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vance Sereda / OMP phone app demo</title>
 <meta name="description" content="A recording of the OMP phone app running a coding session on a local model, with notes on how it works and the hardware behind it.">
-<link rel="stylesheet" href="styles.css?v=e8c35041">
+<link rel="stylesheet" href="styles.css?v=0672a9b8">
 </head>
 <body>
 <main>
@@ -26,12 +26,13 @@
   <section class="intro">
     <div class="phone">
       <div class="screen">
-        <video src="media/demo.mp4?v=e8c35041" poster="media/session.png" autoplay muted loop playsinline aria-label="Screen recording of the phone app running a coding agent session"></video>
+        <video src="media/demo.mp4?v=0672a9b8" poster="media/session.png" autoplay muted loop playsinline aria-label="Screen recording of the phone app running a coding agent session"></video>
       </div>
     </div>
     <div class="text">
       <h2 class="first">The recording</h2>
       <p class="small">One prompt from the app to Qwen3.8-Flash-Next on my rig, about 94 tok/s. Recorded on an Android emulator against a separate test server, only trimmed and captioned.</p>
+      <p class="small">An AI agent drove this demo. I told it what I wanted, and it set up the test server and the emulator, logged the app in, typed the prompt, recorded the screen and built this page.</p>
 
       <h2>How it works</h2>
       <p>I took the app shell from Happy Coder, an open source Claude Code client, and threw out what it talked to. Its backend is now a Pi extension I wrote.</p>
@@ -56,6 +57,6 @@
   </section>
 
 </main>
-<script src="main.js?v=e8c35041"></script>
+<script src="main.js?v=0672a9b8"></script>
 </body>
 </html>
