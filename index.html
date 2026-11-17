@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vance Sereda / OMP phone app demo</title>
-<meta name="description" content="A recording of the OMP phone app running a coding session on a local model, with notes on how it works and the hardware behind it.">
+<title>Vance Sereda / OMP Companion</title>
+<meta name="description" content="OMP Companion: a phone app that drives sessions of the OMP coding agent on a desktop computer, with a recording and notes on how it works.">
 <link rel="stylesheet" href="styles.css?v=384eb79d">
 </head>
 <body>
@@ -19,9 +19,9 @@
     </span>
   </header>
 
-  <h1>Here's some of what I'm working on</h1>
-  <p class="lead">This is an app I made for the coding agent I use, OMP, which is a fork of the Pi coding agent. The phone is driving a session on my computer, and the model is Qwen running on GPUs in my house. No cloud model is involved.</p>
-  <p class="chain"><b>My app</b> <i>&rarr;</i> <b>my Pi extension</b> <i>&rarr;</i> <b>OMP on my computer</b> <i>&rarr;</i> <b>Qwen on my GPUs</b></p>
+  <h1>OMP Companion</h1>
+  <p class="lead">A phone app for OMP, an open-source coding agent forked from Pi. The app drives an agent session running on a desktop computer: you send prompts, watch the agent work and steer it from your phone, while the code and tools stay on the computer. In this recording the model is Qwen, served locally, with no cloud model involved.</p>
+  <p class="chain"><b>Phone app</b> <i>&rarr;</i> <b>encrypted relay</b> <i>&rarr;</i> <b>Pi extension</b> <i>&rarr;</i> <b>OMP session</b></p>
 
   <section class="intro">
     <div class="phone">
@@ -31,18 +31,18 @@
     </div>
     <div class="text">
       <h2 class="first">The recording</h2>
-      <p class="small">One prompt from the app to Qwen3.8-Flash-Next running locally. Recorded on an Android emulator against a separate test server, only trimmed and captioned.</p>
-      <p class="small">An AI agent drove this demo. I told it what I wanted, and it set up the test server and the emulator, logged the app in, typed the prompt, recorded the screen and built this page.</p>
+      <p class="small">A single prompt from the app to Qwen3.8-Flash-Next, recorded on an Android emulator against a test server. The video is trimmed and captioned, with no other edits.</p>
+      <p class="small">The demo itself was produced by a coding agent: from a written brief, it set up the test server and emulator, signed in, ran the prompt, recorded the screen and built this page.</p>
 
       <h2>How it works</h2>
-      <p>I took the app shell from Happy Coder, an open source Claude Code client, and threw out what it talked to. Its backend is now a Pi extension I wrote.</p>
+      <p>The app starts from the open-source Happy Coder client. I replaced its backend with a Pi extension I wrote, so it speaks to OMP directly.</p>
       <ul>
-        <li>On my computer a small wrapper runs OMP in a terminal and keeps a connection to a relay server I host.</li>
+        <li>A small wrapper runs OMP in a terminal on the computer and keeps a connection to a self-hosted relay. Traffic between the app and the computer is end-to-end encrypted.</li>
         <li>The extension runs inside OMP and talks to the wrapper over a local socket.</li>
-        <li>Prompts from the phone go into the session with <code>pi.sendUserMessage</code>.</li>
-        <li>OMP's own events (text, reasoning, tool calls, subagents) go back to the phone, so nothing is read off the terminal.</li>
-        <li>Sessions I start from the phone run in herdr on my computer, so I can attach to the same session at my desk and keep going.</li>
-        <li>Sessions I start on the computer show up on the phone right away. It's the same session either way, so I can switch between them whenever.</li>
+        <li>Prompts from the phone enter the session through <code>pi.sendUserMessage</code>.</li>
+        <li>OMP's structured events (text, reasoning, tool calls and subagents) stream back to the phone, so nothing is scraped from the terminal.</li>
+        <li>Sessions started from the phone run in herdr on the computer, so the same session can be attached and continued at the desk.</li>
+        <li>Sessions started on the computer appear in the app immediately. It is one session either way, so work moves between phone and desk without a handoff.</li>
       </ul>
     </div>
   </section>
