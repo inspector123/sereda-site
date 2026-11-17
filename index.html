@@ -31,7 +31,7 @@
     </div>
     <div class="text">
       <h2 class="first">The recording</h2>
-      <p class="small">One prompt from the app to Qwen3.8-Flash-Next on my rig, about 94 tok/s. Recorded on an Android emulator against a separate test server, only trimmed and captioned.</p>
+      <p class="small">One prompt from the app to Qwen3.8-Flash-Next running locally. Recorded on an Android emulator against a separate test server, only trimmed and captioned.</p>
       <p class="small">An AI agent drove this demo. I told it what I wanted, and it set up the test server and the emulator, logged the app in, typed the prompt, recorded the screen and built this page.</p>
 
       <h2>How it works</h2>
@@ -44,16 +44,6 @@
         <li>Sessions I start from the phone run in herdr on my computer, so I can attach to the same session at my desk and keep going.</li>
         <li>Sessions I start on the computer show up on the phone right away. It's the same session either way, so I can switch between them whenever.</li>
       </ul>
-
-      <h2>The rig</h2>
-      <table>
-        <tr><th>GPUs</th><td>2x RTX 3090, 2x CMP 170HX</td></tr>
-        <tr><th>CPU / board</th><td>EPYC 7452, ASRockRack ROMED8-2T</td></tr>
-        <tr><th>Serving</th><td>vLLM, model split across all four cards, MTP speculative decoding, 256K context</td></tr>
-        <tr><th>Qwen FP8</th><td>90 to 100 tok/s</td></tr>
-        <tr><th>Qwen 4 bit</th><td>about 233 tok/s on two cards</td></tr>
-        <tr><th>500K token input</th><td>145 tok/s after 95 s to first token</td></tr>
-      </table>
     </div>
   </section>
 
